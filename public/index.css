@@ -1,0 +1,136 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.controls .search-filter {
+    display: flex;
+    gap: 10px;
+}
+
+.controls input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+}
+
+.controls select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.controls button:hover {
+    background-color: #45a049;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+/* make the quantity  2 child  align between left and right */
+
+.out-of-stock{
+    padding: 5px 8px;
+    border-radius: 5px;
+    background-color: #ff5e5e;
+    color: white; 
+}
+
+.low-stock {
+    padding: 5px 8px;
+    border-radius: 5px;
+    background-color: #ffd65b;
+    color: white; 
+}
+
+.in-stock {
+    padding: 5px 8px;
+    border-radius: 5px;
+    background-color: #00da00;
+    color: white;
+}
+
+.no-results{
+    padding: 8px 10px;
+    color: gray;
+    font-style: italic;
+    text-align: center;
+    font-size: smaller;
+}
+.actions button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.actions .view {
+    background-color: #2196F3;
+    color: white;
+}
+
+.actions .edit {
+    background-color: #FFC107;
+    color: white;
+}
+
+.actions .delete {
+    background-color: #F44336;
+    color: white;
+}
+
+.actions button:hover {
+    opacity: 0.8;
+}

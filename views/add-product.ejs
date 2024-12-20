@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Inventory</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="form.css" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Product</h1>
+
+        <div class="form-container" id="product-form">
+            <label for="product-name">Name</label>
+            <input type="text" id="product-name" placeholder="Enter product name">
+
+            <label for="product-description">Description</label>
+            <textarea id="product-description" placeholder="Enter product description" rows="4"></textarea>
+
+            <label for="product-quantity">Quantity</label>
+            <input type="number" min = "0" step="1" id="product-quantity" placeholder="Enter product quantity">
+
+            <label for="product-price">Price</label>
+            <input type="number" min = "0" id="product-price" placeholder="Enter product price" step="0.01">
+
+            <button onclick="saveProduct()">Save Product</button>
+        </div>
+    </div>
+
+    <script>
+        // Save a new product
+        function saveProduct() {
+            const name = document.getElementById('product-name').value;
+            const description = document.getElementById('product-description').value;
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const price = parseFloat(document.getElementById('product-price').value);
+
+            if (!name || !description || isNaN(quantity) || isNaN(price)) {
+                alert('Please fill in all fields correctly.');
+                return;
+            }
+
+            const newProduct = { name, description, quantity, price };
+
+            axios.post('http://localhost:3000/api/products', newProduct)
+                .then(response => {
+                    alert('Product added successfully');
+                    window.location.href = 'http://localhost:3000/';
+                })
+                .catch(error => {
+                    console.error('Error adding product:', error);
+                    alert('Failed to add product');
+                });
+        }
+    </script>
+</body>
+</html>

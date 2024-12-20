@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Inventory</title>    
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    
+</head>
+<body>
+    <div class="container" >
+        <h1>Product Inventory</h1>
+        <div class="controls">
+            <a href="http://localhost:3000/add-product"><button id="add-product">Add Product</button></a>
+            <div class="search-filter">
+                <input type="text" id="search-field" oninput="searchProducts()" placeholder="Search products...">
+                <select id="filter">
+                    <option value="">Filter by Stock</option>
+                    <option value="low">Low Stock</option>
+                    <option value="out">Out of Stock</option>
+                </select>
+            </div>
+        </div>
+
+        <div>Total Products in Inventory: <span id="inventory-total">0</span></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-table-body">
+              
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+
+        function fetchProductTotalPrice(){
+            axios.get('http://localhost:3000/api/products/total-price')
+                .then(response => {
+                    //console.log(response.data['data']);
+                    const total = response.data['data'];
+                    document.getElementById('inventory-total').innerHTML = `₱ ${total[0].total_price?? 0}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+
+        // Example Axios call to fetch products
+        function fetchProducts(filtered) {
+
+            const tableBody = document.getElementById('product-table-body');
+            tableBody.innerHTML = '';
+
+            axios.get('http://localhost:3000/api/products')
+                .then(response => {
+                    //console.log(response.data['data']);
+                    var products = response.data['data'];
+                    const filter = filtered;
+                    
+
+
+                    if (filter === 'low') {
+                        products = products.filter(product => product.quantity <= 10 && product.quantity > 0);
+                    }
+
+                    if (filter === 'out') {
+                        products = products.filter(product => product.quantity === 0);
+                    }
+
+
+                    products.forEach(product => {
+                        
+                        const outOfStock = product.quantity === 0;
+                        const isLowStock = product.quantity <= 10;
+                        const status = outOfStock ? `<small class="out-of-stock">Out of Stock</small>` : isLowStock ? `<small class="low-stock">Low Stock</small>` :  `<small class="in-stock">In Stock</small>`;
+                        const row = `<tr>
+                                <td>${product.id}</td>
+                                <td>${product.name}</td>
+                                <td>${product.description}</td>
+                                <td> ${product.quantity}</td>
+                                <td> ${status}</td>
+                                <td>₱ ${product.price}</td>
+                                <td class="actions" >
+                                    <button class="edit" onclick="editProduct(${product.id})">Edit</button>
+                                    <button class="delete" onclick="deleteProduct(${product.id}, '${product.name}')">Delete</button>
+                                </td>
+                            </tr>`;
+                  
+                        tableBody.innerHTML += row;
+                    });
+                    fetchProductTotalPrice();
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                    const row = `<tr> 
+                        <td colspan="7" class="no-results">- no results - </td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                    fetchProductTotalPrice();
+                });
+        }
+        
+
+        function editProduct(productId) {
+            window.location.href = `http://localhost:3000/edit-product/${productId}`;
+        }
+
+
+        // Function to delete a product
+        function deleteProduct(productId, productName) {
+            const filter = document.getElementById('filter').value;
+            const search = document.getElementById('search-field').value;
+
+            //
+            if (confirm(`Are you sure you want to delete ${productName}?`)) {
+                axios.delete(`http://localhost:3000/api/products/${productId}/?_method=DELETE`)
+                    .then(response => {
+                        alert('Product deleted successfully');
+                        if (search) {
+                            searchProducts();
+                        }else{
+                            fetchProducts(filter);
+                        }
+                        
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                        alert('Failed to delete the product');
+                    });
+            }
+        }
+
+
+        // Search
+        function searchProducts() {
+            const search = document.getElementById('search-field').value;
+            const filter = document.getElementById('filter').value;
+            if (!search) {
+                fetchProducts(filter);
+                return;
+            }
+
+            const tableBody = document.getElementById('product-table-body');
+            tableBody.innerHTML = '';
+
+            axios.get(`http://localhost:3000/api/products/search/${search}`)
+            .then(response => {
+                //console.log(response.data['data']);
+                var products = response.data['data'];
+                const tableBody = document.getElementById('product-table-body');
+                const filter = document.getElementById('filter').value;
+                
+                tableBody.innerHTML = '';
+
+
+                if (filter === 'low') {
+                    products = products.filter(product => product.quantity <= 10 && product.quantity > 0);
+                }
+
+                if (filter === 'out') {
+                    products = products.filter(product => product.quantity === 0);
+                }
+
+
+                products.forEach(product => {
+                    
+                    const outOfStock = product.quantity === 0;
+                    const isLowStock = product.quantity <= 10;
+                    const status = outOfStock ? `<small class="out-of-stock">Out of Stock</small>` : isLowStock ? `<small class="low-stock">Low Stock</small>` :  `<small class="in-stock">In Stock</small>`;
+                    const row = `<tr>
+                            <td>${product.id}</td>
+                            <td>${product.name}</td>
+                            <td>${product.description}</td>
+                            <td> ${product.quantity}</td>
+                            <td> ${status}</td>
+                            <td>₱ ${product.price}</td>
+                            <td class="actions" >
+                                <button class="edit" onclick="editProduct(${product.id})">Edit</button>
+                                <button class="delete" onclick="deleteProduct(${product.id}, '${product.name}')">Delete</button>
+                            </td>
+                        </tr>`;
+              
+                    tableBody.innerHTML += row;
+                });
+
+                fetchProductTotalPrice();
+            })
+            .catch(error => {
+                        console.error('Error searching products:', error);
+                            const row = `<tr> 
+                                <td colspan="7" class="no-results">- no results - </td>
+                            </tr>`;
+                            tableBody.innerHTML += row;
+                            fetchProductTotalPrice();
+                        });
+        }
+            
+
+                   
+
+          
+    
+
+        document.getElementById('filter').addEventListener('change', function(e) {
+                const search = document.getElementById('search-field').value;
+                if (search) {
+                    searchProducts();
+                    return;
+                }
+                if (!search) {
+                    fetchProducts(e.target.value);
+                    return;
+                }
+                fetchProducts(e.target.value);
+            })
+
+        // Fetch products on page load
+        document.addEventListener('DOMContentLoaded', fetchProducts(''));
+    </script>
+</body>
+</html>
+
+
+
